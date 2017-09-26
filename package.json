@@ -1,0 +1,19 @@
+{
+  "name": "stdio-gui",
+  "description": "Terminal emulator for browsers",
+  "version": "0.0.0",
+  "author": {
+    "name": "Laurent Christophe",
+    "email": "lachrist@vub.ac.be"
+  },
+  "repository": "lachrist/std-gui",
+  "license": "MIT",
+  "dependencies": {},
+  "main": "./main.js",
+  "keywords": [
+    "Terminal",
+    "Console",
+    "Emulator",
+    "Browser"
+  ]
+}

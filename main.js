@@ -27,19 +27,20 @@ module.exports = function (container, options) {
   var cursor = document.createElement("span");
 
   container.tabIndex = 0;
+  container.className += " stdio-widget";
   container.style.color = "white";
   container.style.fontFamily = "monospace";
   container.style.backgroundColor = "black";
   container.style.borderRadius = "20px";
   container.style.padding = "20px";
   container.style.overflow = "scroll";
+  container.style.whiteSpace = "nowrap";
   container.appendChild(clear);
   container.appendChild(prompt);
 
   options = options || {};
   options.encoding = options.encoding || "utf8";
   options.greeting = options.greeting || "> ";
-  options.onctrl = options.onctrl || function () {};
 
   clear.style.position = "relative";
   clear.style.top = "-10px";
@@ -61,7 +62,11 @@ module.exports = function (container, options) {
 
   container.onkeydown = function (event) {
     if (event.ctrlKey) {
-      options.onctrl(event.key);
+      if (event.key !== "Control") {
+        var evt = new Event("ctrl");
+        evt.key = event.key;
+        container.dispatchEvent(evt);
+      }
     } else if (event.keyCode === 8 && cursor.previousSibling !== greeting) {
       prompt.removeChild(cursor.previousSibling);
     } else if (event.keyCode === 37 && cursor.previousSibling !== greeting) {
@@ -105,20 +110,20 @@ module.exports = function (container, options) {
     }
   }
 
-  return function (stdio) {
-    stdins.push(stdio[0]);
+  return function (stdin, stdout, stderr) {
+    stdins.push(stdin);
     function remove () {
-      var index = stdins.indexOf(stdio[0]);
+      var index = stdins.indexOf(stdin);
       if (index !== -1) {
         stdins.splice(index, 1)
       }
     }
-    stdio[0].on("close", remove);
-    stdio[0].on("finish", remove);
-    stdio[1].setEncoding(options.encoding);
-    stdio[1].on("data", write(container, prompt, "white"));
-    stdio[2].setEncoding(options.encoding);
-    stdio[2].on("data", write(container, prompt, "red"));
+    stdin.on("close", remove);
+    stdin.on("finish", remove);
+    stdout.setEncoding(options.encoding);
+    stdout.on("data", write(container, prompt, "white"));
+    stderr.setEncoding(options.encoding);
+    stderr.on("data", write(container, prompt, "red"));
   };
 
 };

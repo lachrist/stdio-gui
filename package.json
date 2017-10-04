@@ -1,12 +1,12 @@
 {
-  "name": "stdio-gui",
+  "name": "stdio-widget",
   "description": "Terminal emulator for browsers",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": {
     "name": "Laurent Christophe",
     "email": "lachrist@vub.ac.be"
   },
-  "repository": "lachrist/std-gui",
+  "repository": "lachrist/stdio-widget",
   "license": "MIT",
   "dependencies": {},
   "main": "./main.js",
@@ -14,6 +14,8 @@
     "Terminal",
     "Console",
     "Emulator",
-    "Browser"
+    "Browser",
+    "Browserify",
+    "Widget"
   ]
 }

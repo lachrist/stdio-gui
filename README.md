@@ -1,24 +1,16 @@
 # stdio-gui
 
-StdioGUI is a terminal emulator for browsers which works with [node.js streams](https://nodejs.org/api/stream.html) thanks to [browserify](http://browserify.org).
+stdio-widget is a terminal emulator for browsers which works with [node.js streams](https://nodejs.org/api/stream.html) through [browserify](http://browserify.org).
+Test [here](test/main.js) result [here](https://rawgit.com/lachrist/stdio-widget/master/test/index.html).
 
-```js
-var StdioGui = require("stdio-gui");
-var stdin = new Stream.Writable(...);
-var stdout = new Stream.Readable(...);
-var stderr = new Stream.Readable(...);
-var div = document.createElement("div");
-var stdiogui = StdioGui(div, {
-  encoding: "utf8",
-  greeting: "> ",
-  onctrl: function (key) {
-    if (key === "c") {
-      console.log("SIGINT");
-    } else if (key === "d") {
-      stdin.write(null);
-    }
-  }
-});
-var stdio = [stdin, stdout, stderr];
-stdiogui(stdio);
-```
+### `stdio = require("stdio-widget")(container, options)`
+  * `container :: dom.Element`
+    * BrowserEvent `"ctrl"`
+      * `key :: string`
+  * `options :: object`
+    * `encoding :: string`
+    * `greeting :: string`
+  * `stdio(stdin, stdout, stderr)`
+    * `stdin :: stream.Writable`
+    * `stdout :: stream.Readable`
+    * `stderr :: stream.Readable`

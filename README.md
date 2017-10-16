@@ -1,7 +1,7 @@
 # stdio-gui
 
 stdio-widget is a terminal emulator for browsers which works with [nodejs streams](https://nodejs.org/api/stream.html) through [browserify](http://browserify.org).
-Usage [here](demo/), live demo [here](https://cdn.rawgit.com/lachrist/stdio-widget/763990d8/demo/index.html).
+Usage [here](demo/), live demo [here](https://cdn.rawgit.com/lachrist/stdio-widget/d93eef8b/demo/index.html).
 
 ### `stdio = require("stdio-widget")(container, options)`
   * `container :: dom.Element`

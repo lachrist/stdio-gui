@@ -64,8 +64,6 @@ module.exports = (container, options) => {
   };
 
   container.className += " stdio-widget";
-  container.style.minWidth = "100px";
-  container.style.minHeight = "50px";
   container.style.overflow = "hidden";
   container.style.position = "relative";
   container.style.color = options.colors.stdin;

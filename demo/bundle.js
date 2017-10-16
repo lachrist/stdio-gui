@@ -30,78 +30,86 @@ stdio(stdin, stdout, stderr);
 document.body.append(div);
 },{"../main.js":2,"stream":28}],2:[function(require,module,exports){
 
-function write (container, prompt, color) {
-  function print (line) {
-    var span = document.createElement("span");
+const write = (container, prompt, color) => {
+  const print = (line) => {
+    const span = document.createElement("span");
     span.style.color = color;
     span.textContent = line;
     container.insertBefore(span, prompt);
-  }
-  return function (text) {
-    var lines = text.split("\n");
-    var last = lines.pop();
-    lines.forEach(function (line) {
+  };
+  return (text) => {
+    const lines = text.split("\n");
+    const last = lines.pop();
+    lines.forEach((line) => {
       print(line);
       container.insertBefore(document.createElement("br"), prompt);
     });
     print(last);
-  }
+    container.scrollTop = container.scrollHeight;
+  };
 }
 
-module.exports = function (container, options) {
-
-  var stdins = [];
-  var last = true;
-  var clear = document.createElement("div");
-  var prompt = document.createElement("div");
-  var greeting = document.createElement("span");
-  var cursor = document.createElement("span");
-
-  container.tabIndex = 0;
-  container.className += " stdio-widget";
-  container.style.color = "white";
-  container.style.fontFamily = "monospace";
-  container.style.backgroundColor = "black";
-  container.style.borderRadius = "20px";
-  container.style.padding = "20px";
-  container.style.overflow = "scroll";
-  container.style.whiteSpace = "nowrap";
-  container.appendChild(clear);
-  container.appendChild(prompt);
+module.exports = (container, options) => {
 
   options = options || {};
   options.encoding = options.encoding || "utf8";
   options.greeting = options.greeting || "> ";
 
-  clear.style.position = "relative";
-  clear.style.top = "-10px";
-  clear.textContent = "Clear";
-  clear.style.cursor = "pointer";
-  clear.style.textDecoration = "underline";
-  clear.onclick = function () {
-    while (container.firstChild.nextSibling)
-      container.removeChild(container.firstChild.nextSibling);
-    container.appendChild(prompt);
-  };
+  var last = true;
+  
+  const stdins = [];
 
+  const cursor = document.createElement("span");
   cursor.style.backgroundColor = "white";
   cursor.style.color = "black";
   cursor.textContent = "_";
+
+  const greeting = document.createElement("span");
   greeting.textContent = options.greeting;
+
+  const prompt = document.createElement("div");
   prompt.appendChild(greeting);
   prompt.appendChild(cursor);
 
-  container.onkeydown = function (event) {
+  const panel = document.createElement("div");
+  panel.tabIndex = 0;
+  panel.style.overflow = "scroll";
+  panel.style.whiteSpace = "nowrap";
+  panel.style.height = "50px";
+  panel.appendChild(prompt);
+
+  const clear = document.createElement("div");
+  clear.style.position = "absolute";
+  clear.style.right = "30px";
+  clear.textContent = "Clear";
+  clear.style.cursor = "pointer";
+  clear.onclick = () => {
+    while (panel.firstChild)
+      panel.removeChild(panel.firstChild);
+    panel.appendChild(prompt);
+  };
+
+  container.className += " stdio-widget";
+  container.position = "relative"
+  container.style.color = "white";
+  container.style.fontFamily = "monospace";
+  container.style.backgroundColor = "black";
+  container.style.borderRadius = "20px";
+  container.style.padding = "20px";
+  container.appendChild(panel);
+  container.appendChild(clear);
+
+  panel.onkeydown = (event) => {
     if (event.ctrlKey) {
       if (event.key !== "Control") {
-        var evt = new Event("ctrl");
+        const evt = new Event("ctrl");
         evt.key = event.key;
         container.dispatchEvent(evt);
       }
     } else if (event.keyCode === 8 && cursor.previousSibling !== greeting) {
       prompt.removeChild(cursor.previousSibling);
     } else if (event.keyCode === 37 && cursor.previousSibling !== greeting) {
-      var current = cursor.textContent;
+      const current = cursor.textContent;
       cursor.textContent = cursor.previousSibling.textContent;
       prompt.removeChild(cursor.previousSibling);
       if (last) {
@@ -119,42 +127,43 @@ module.exports = function (container, options) {
         cursor.textContent = "_";
       }
     } else if (event.keyCode === 13) {
-      var input = prompt.textContent.substring(options.greeting.length);
+      let input = prompt.textContent.substring(options.greeting.length);
       if (last)
         input = input.substring(0, input.length-1);
       input += "\n";
-      var div = document.createElement("div");
+      const div = document.createElement("div");
       div.textContent = options.greeting+input
-      container.insertBefore(div, prompt);
-      stdins.forEach(function (stdin) { stdin.write(input) });
+      panel.insertBefore(div, prompt);
+      stdins.forEach((stdin) => { stdin.write(input) });
       while (prompt.firstChild.nextSibling)
         prompt.removeChild(prompt.firstChild.nextSibling);
       prompt.append(cursor);
       cursor.textContent = "_";
       last = true;
     }
+    panel.scrollTop = panel.scrollHeight;
   }
 
-  container.onkeypress = function (event) {
+  panel.onkeypress = (event) => {
     if (!event.ctrlKey && event.charCode !== 8 && event.charCode !== 13) {
       prompt.insertBefore(document.createTextNode(String.fromCharCode(event.charCode)), cursor);
     }
   }
 
-  return function (stdin, stdout, stderr) {
+  return (stdin, stdout, stderr) => {
     stdins.push(stdin);
-    function remove () {
-      var index = stdins.indexOf(stdin);
+    const remove = () => {
+      const index = stdins.indexOf(stdin);
       if (index !== -1) {
         stdins.splice(index, 1)
       }
-    }
+    };
     stdin.on("close", remove);
     stdin.on("finish", remove);
     stdout.setEncoding(options.encoding);
-    stdout.on("data", write(container, prompt, "white"));
+    stdout.on("data", write(panel, prompt, "white"));
     stderr.setEncoding(options.encoding);
-    stderr.on("data", write(container, prompt, "red"));
+    stderr.on("data", write(panel, prompt, "red"));
   };
 
 };

@@ -121,7 +121,7 @@ module.exports = (container, options) => {
       const div = document.createElement("div");
       div.textContent = options.greeting+input
       panel.insertBefore(div, prompt);
-      stdins.forEach((stdin) => { stdin.write(input) });
+      stdins.forEach((stdin) => { stdin.write(input, options.encoding) });
       while (prompt.firstChild.nextSibling)
         prompt.removeChild(prompt.firstChild.nextSibling);
       prompt.append(cursor);
@@ -138,19 +138,25 @@ module.exports = (container, options) => {
   });
 
   return (stdin, stdout, stderr) => {
-    stdins.push(stdin);
-    const remove = () => {
-      const index = stdins.indexOf(stdin);
-      if (index !== -1) {
-        stdins.splice(index, 1)
-      }
-    };
-    stdin.on("close", remove);
-    stdin.on("finish", remove);
-    stdout.setEncoding(options.encoding);
-    stdout.on("data", write(panel, prompt, options.colors.stdout));
-    stderr.setEncoding(options.encoding);
-    stderr.on("data", write(panel, prompt, options.colors.stderr));
+    if (stdin) {
+      stdins.push(stdin);
+      const remove = () => {
+        const index = stdins.indexOf(stdin);
+        if (index !== -1) {
+          stdins.splice(index, 1)
+        }
+      };
+      stdin.on("close", remove);
+      stdin.on("finish", remove);
+    }
+    if (stdout) {
+      stdout.setEncoding(options.encoding);
+      stdout.on("data", write(panel, prompt, options.colors.stdout));
+    }
+    if (stderr) {
+      stderr.setEncoding(options.encoding);
+      stderr.on("data", write(panel, prompt, options.colors.stderr));
+    }
   };
 
 };

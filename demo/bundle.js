@@ -5,10 +5,8 @@ function noop () {};
 var stdin = new Stream.Writable({
   decodeStrings: false,
   write: function (chunk, encoding, callback) {
-    // As stdio-widget's encoding is set to utf8 and
-    // decodeStrings is set to false, this should never append."
     if (encoding !== "utf8")
-      throw new Error("assertion failure");
+      throw new Error("this should never happen");
     stdout.push(JSON.stringify(chunk), "utf8");
     callback();
   }
@@ -16,18 +14,27 @@ var stdin = new Stream.Writable({
 var stdout = new Stream.Readable({read:noop});
 var stderr = new Stream.Readable({read:noop});
 var div = document.createElement("div");
-var stdio = StdioWidget(div, {
-  encoding: "utf8",
-  greeting: "> "
-});
 div.addEventListener("ctrl", function (event) {
   stdout.push("ctrl-"+event.key);
 });
+div.style.height = "200px";
+div.style.width = "400px";
+div.style.resize = "both";
+document.body.append(div);
+var stdio = StdioWidget(div, {
+  encoding: "utf8",
+  greeting: "popov> ",
+  colors: {
+    stdin: "Black",
+    stdout: "Green",
+    stderr: "DarkMagenta",
+    background: "LightGrey"
+  }
+});
+stdio(stdin, stdout, stderr);
 setInterval(function () {
   stderr.push("error", "utf8");
 }, 5000);
-stdio(stdin, stdout, stderr);
-document.body.append(div);
 },{"../main.js":2,"stream":28}],2:[function(require,module,exports){
 
 const write = (container, prompt, color) => {
@@ -54,14 +61,19 @@ module.exports = (container, options) => {
   options = options || {};
   options.encoding = options.encoding || "utf8";
   options.greeting = options.greeting || "> ";
+  options.colors = options.colors || {};
+  options.colors.stdin = options.colors.stdin || "white";
+  options.colors.stdout = options.colors.stdout || "white";
+  options.colors.stderr = options.colors.stderr || "red";
+  options.colors.background = options.colors.background || "black";
 
   var last = true;
-  
+
   const stdins = [];
 
   const cursor = document.createElement("span");
-  cursor.style.backgroundColor = "white";
-  cursor.style.color = "black";
+  cursor.style.backgroundColor = options.colors.stdin;
+  cursor.style.color = options.colors.background;
   cursor.textContent = "_";
 
   const greeting = document.createElement("span");
@@ -75,7 +87,7 @@ module.exports = (container, options) => {
   panel.tabIndex = 0;
   panel.style.overflow = "scroll";
   panel.style.whiteSpace = "nowrap";
-  panel.style.height = "50px";
+  panel.style.height = "100%";
   panel.appendChild(prompt);
 
   const clear = document.createElement("div");
@@ -90,10 +102,13 @@ module.exports = (container, options) => {
   };
 
   container.className += " stdio-widget";
-  container.position = "relative"
-  container.style.color = "white";
+  container.style.minWidth = "100px";
+  container.style.minHeight = "50px";
+  container.style.overflow = "hidden";
+  container.style.position = "relative";
+  container.style.color = options.colors.stdin;
   container.style.fontFamily = "monospace";
-  container.style.backgroundColor = "black";
+  container.style.backgroundColor = options.colors.background;
   container.style.borderRadius = "20px";
   container.style.padding = "20px";
   container.appendChild(panel);
@@ -161,9 +176,9 @@ module.exports = (container, options) => {
     stdin.on("close", remove);
     stdin.on("finish", remove);
     stdout.setEncoding(options.encoding);
-    stdout.on("data", write(panel, prompt, "white"));
+    stdout.on("data", write(panel, prompt, options.colors.stdout));
     stderr.setEncoding(options.encoding);
-    stderr.on("data", write(panel, prompt, "red"));
+    stderr.on("data", write(panel, prompt, options.colors.stderr));
   };
 
 };

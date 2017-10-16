@@ -10,6 +10,11 @@ Usage [here](demo/), live demo [here](https://cdn.rawgit.com/lachrist/stdio-widg
   * `options :: object`
     * `encoding :: string`
     * `greeting :: string`
+    * `colors :: object`
+      * `stdin :: string`
+      * `stdout :: string`
+      * `stderr :: string`
+      * `background :: string`
   * `stdio(stdin, stdout, stderr)`
     * `stdin :: stream.Writable`
     * `stdout :: stream.Readable`

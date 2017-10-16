@@ -23,14 +23,19 @@ module.exports = (container, options) => {
   options = options || {};
   options.encoding = options.encoding || "utf8";
   options.greeting = options.greeting || "> ";
+  options.colors = options.colors || {};
+  options.colors.stdin = options.colors.stdin || "white";
+  options.colors.stdout = options.colors.stdout || "white";
+  options.colors.stderr = options.colors.stderr || "red";
+  options.colors.background = options.colors.background || "black";
 
   var last = true;
-  
+
   const stdins = [];
 
   const cursor = document.createElement("span");
-  cursor.style.backgroundColor = "white";
-  cursor.style.color = "black";
+  cursor.style.backgroundColor = options.colors.stdin;
+  cursor.style.color = options.colors.background;
   cursor.textContent = "_";
 
   const greeting = document.createElement("span");
@@ -44,7 +49,7 @@ module.exports = (container, options) => {
   panel.tabIndex = 0;
   panel.style.overflow = "scroll";
   panel.style.whiteSpace = "nowrap";
-  panel.style.height = "50px";
+  panel.style.height = "100%";
   panel.appendChild(prompt);
 
   const clear = document.createElement("div");
@@ -59,10 +64,13 @@ module.exports = (container, options) => {
   };
 
   container.className += " stdio-widget";
-  container.position = "relative"
-  container.style.color = "white";
+  container.style.minWidth = "100px";
+  container.style.minHeight = "50px";
+  container.style.overflow = "hidden";
+  container.style.position = "relative";
+  container.style.color = options.colors.stdin;
   container.style.fontFamily = "monospace";
-  container.style.backgroundColor = "black";
+  container.style.backgroundColor = options.colors.background;
   container.style.borderRadius = "20px";
   container.style.padding = "20px";
   container.appendChild(panel);
@@ -130,9 +138,9 @@ module.exports = (container, options) => {
     stdin.on("close", remove);
     stdin.on("finish", remove);
     stdout.setEncoding(options.encoding);
-    stdout.on("data", write(panel, prompt, "white"));
+    stdout.on("data", write(panel, prompt, options.colors.stdout));
     stderr.setEncoding(options.encoding);
-    stderr.on("data", write(panel, prompt, "red"));
+    stderr.on("data", write(panel, prompt, options.colors.stderr));
   };
 
 };

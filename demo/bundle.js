@@ -33,28 +33,36 @@ var stdio = StdioWidget(div, {
 });
 stdio(stdin, stdout, stderr);
 setInterval(function () {
-  stderr.push("error", "utf8");
+  stderr.push("\\   /\n \\ / \n  X  \n / \\ \n/   \\\n", "utf8");
 }, 5000);
 },{"../main.js":2,"stream":28}],2:[function(require,module,exports){
 
 const write = (container, prompt, color) => {
-  const print = (line) => {
-    const span = document.createElement("span");
-    span.style.color = color;
-    span.textContent = line;
-    container.insertBefore(span, prompt);
-  };
   return (text) => {
     const lines = text.split("\n");
-    const last = lines.pop();
-    lines.forEach((line) => {
-      print(line);
-      container.insertBefore(document.createElement("br"), prompt);
-    });
-    print(last);
-    container.scrollTop = container.scrollHeight;
+    const span1 = document.createElement("span");
+    span1.textContent = lines.shift();
+    span1.style.color = color;
+    span1.style.whiteSpace = "pre";
+    container.insertBefore(span1, prompt);
+    if (lines.length) {
+      const div = document.createElement("div");
+      div.style.color = color;
+      div.style.whiteSpace = "pre";
+      container.insertBefore(div, prompt);
+      const span2 = document.createElement("span");
+      span2.textContent = lines.pop();
+      span2.style.color = color;
+      span2.style.whiteSpace = "pre";
+      container.insertBefore(span2, prompt);
+      if (lines.length) {
+        lines[0] = lines[0] || " ";
+        lines[lines.length-1] = lines[lines.length-1] || " ";
+        div.textContent = lines.join("\n")||" ";
+      }
+    }
   };
-}
+};
 
 module.exports = (container, options) => {
 
@@ -77,9 +85,11 @@ module.exports = (container, options) => {
   cursor.textContent = "_";
 
   const greeting = document.createElement("span");
+  greeting.whiteSpace = "pre";
   greeting.textContent = options.greeting;
 
   const prompt = document.createElement("div");
+  greeting.whiteSpace = "pre";
   prompt.appendChild(greeting);
   prompt.appendChild(cursor);
 
@@ -157,9 +167,10 @@ module.exports = (container, options) => {
         input = input.substring(0, input.length-1);
       input += "\n";
       const div = document.createElement("div");
+      div.style.whiteSpace = "pre";
       div.textContent = options.greeting+input
       panel.insertBefore(div, prompt);
-      stdins.forEach((stdin) => { stdin.write(input) });
+      stdins.forEach((stdin) => { stdin.write(input, options.encoding) });
       while (prompt.firstChild.nextSibling)
         prompt.removeChild(prompt.firstChild.nextSibling);
       prompt.append(cursor);
@@ -176,19 +187,25 @@ module.exports = (container, options) => {
   });
 
   return (stdin, stdout, stderr) => {
-    stdins.push(stdin);
-    const remove = () => {
-      const index = stdins.indexOf(stdin);
-      if (index !== -1) {
-        stdins.splice(index, 1)
-      }
-    };
-    stdin.on("close", remove);
-    stdin.on("finish", remove);
-    stdout.setEncoding(options.encoding);
-    stdout.on("data", write(panel, prompt, options.colors.stdout));
-    stderr.setEncoding(options.encoding);
-    stderr.on("data", write(panel, prompt, options.colors.stderr));
+    if (stdin) {
+      stdins.push(stdin);
+      const remove = () => {
+        const index = stdins.indexOf(stdin);
+        if (index !== -1) {
+          stdins.splice(index, 1)
+        }
+      };
+      stdin.on("close", remove);
+      stdin.on("finish", remove);
+    }
+    if (stdout) {
+      stdout.setEncoding(options.encoding);
+      stdout.on("data", write(panel, prompt, options.colors.stdout));
+    }
+    if (stderr) {
+      stderr.setEncoding(options.encoding);
+      stderr.on("data", write(panel, prompt, options.colors.stderr));
+    }
   };
 
 };

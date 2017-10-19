@@ -32,5 +32,5 @@ var stdio = StdioWidget(div, {
 });
 stdio(stdin, stdout, stderr);
 setInterval(function () {
-  stderr.push("error", "utf8");
+  stderr.push("\\   /\n \\ / \n  X  \n / \\ \n/   \\\n", "utf8");
 }, 5000);

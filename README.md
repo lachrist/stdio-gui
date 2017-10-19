@@ -1,7 +1,7 @@
 # stdio-widget
 
 [npm module](https://www.npmjs.com/package/stdio-widget) to emulate terminals on the browser, works with [nodejs streams](https://nodejs.org/api/stream.html) through [browserify](http://browserify.org).
-Usage [here](demo/), live demo [here](https://cdn.rawgit.com/lachrist/stdio-widget/271d5603/demo/index.html).
+Usage [here](demo/), live demo [here](https://cdn.rawgit.com/lachrist/stdio-widget/34c5611f/demo/index.html).
 
 ### `stdio = require("stdio-widget")(container, options)`
   * `container :: dom.Element`

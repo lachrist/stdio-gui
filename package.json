@@ -1,6 +1,6 @@
 {
   "name": "stdio-widget",
-  "description": "Terminal emulator for browsers",
+  "description": "Emulate terminals on the browser, works with nodejs streams",
   "version": "0.0.9",
   "author": {
     "name": "Laurent Christophe",

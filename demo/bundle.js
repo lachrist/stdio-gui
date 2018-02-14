@@ -58,7 +58,7 @@ const write = (container, prompt, color) => {
       if (lines.length) {
         lines[0] = lines[0] || " ";
         lines[lines.length-1] = lines[lines.length-1] || " ";
-        div.textContent = lines.join("\n")||" ";
+        div.textContent = lines.join("\n");
       }
     }
   };
@@ -99,7 +99,7 @@ module.exports = (container, options) => {
   panel.style.borderStyle = "dotted";
   panel.style.borderWidth = "1px";
   panel.style.borderColor = options.colors.background;
-  panel.style.overflow = "scroll";
+  panel.style.overflow = "auto";
   panel.style.whiteSpace = "nowrap";
   panel.style.height = "100%";
   panel.appendChild(prompt);
